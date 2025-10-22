@@ -41,12 +41,11 @@ def generate_certificates(excel_file, template_file, output_folder, font_path="a
     print("✅ All certificates generated successfully (names centered)!")
 
 
-# ---------------------- Associate Functions ----------------------
+# Functions for generating Associate Degree documents
 def AssociateExcel_data(filename):
     workbook = openpyxl.load_workbook(filename)
     sheet = workbook.active
     return list(sheet.values)
-
 
 def AssociateDocument(template, output_directory, student):
     doc = DocxTemplate(template)
@@ -66,16 +65,14 @@ def AssociateDocument(template, output_directory, student):
         'ed_e': student[11],
         'cur_date': current_date
     })
-    doc_name = os.path.join(output_directory, f"{student[3]}.docx")
+    doc_name = os.path.join(output_directory, "{}.docx".format(student[3]))
     doc.save(doc_name)
     return doc_name
-
 
 def AssociateConvertPDF(doc_path, pdf_directory):
     pdf_path = os.path.join(pdf_directory, os.path.splitext(os.path.basename(doc_path))[0] + ".pdf")
     convert(doc_path, pdf_path)
     return pdf_path
-
 
 def GeneratAssociate(option):
     excel_file = "Associate.xlsx"
@@ -96,8 +93,7 @@ def GeneratAssociate(option):
             AssociateConvertPDF(doc_path, pdf_directory)
             if option == "pdf":
                 os.remove(doc_path)
-
-    print(f"✅ All associate files generated!")
+    print("All files for option '{}' have been generated!".format(option))
 
 
 # ---------------------- Transcript Functions ----------------------
