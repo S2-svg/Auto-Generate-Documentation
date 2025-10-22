@@ -1,3 +1,4 @@
+
 import tkinter as tk
 from tkinter import messagebox
 from ttkbootstrap import Style
@@ -13,27 +14,31 @@ from datetime import datetime
 
 # ---------------------- Certificate Generator ----------------------
 def generate_certificates(excel_file, template_file, output_folder, font_path="arialbd.ttf", font_size=100):
+    """Generate certificates with perfectly centered names."""
     data = pd.read_excel(excel_file)
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
 
     font_name = ImageFont.truetype(font_path, font_size)
-    for index, row in data.iterrows():
-        name = row["Name"]
+
+    for _, row in data.iterrows():
+        name = str(row["Name"]).strip()
         certificate = Image.open(template_file)
         draw = ImageDraw.Draw(certificate)
 
-        if len(name) >= 15 and len(name) < 25:
-            name_position = (550, 600)
-        elif len(name) >= 10 and len(name) < 15:
-            name_position = (700, 600)
-        else:
-            name_position = (730, 600)
+        # --- Center the name text ---
+        bbox = draw.textbbox((0, 0), name, font=font_name)
+        text_width = bbox[2] - bbox[0]
+        text_height = bbox[3] - bbox[1]
+        x = (certificate.width - text_width) / 2
+        y = 600  # Adjust vertically to fit your design
 
-        draw.text(name_position, name, fill="orange", font=font_name)
+        draw.text((x, y), name, fill="orange", font=font_name)
+
         output_path = os.path.join(output_folder, f"certificate_{name}.png")
         certificate.save(output_path)
-    print("All certificates generated!")
+
+    print("✅ All certificates generated successfully (names centered)!")
 
 
 # ---------------------- Associate Functions ----------------------
@@ -41,6 +46,7 @@ def AssociateExcel_data(filename):
     workbook = openpyxl.load_workbook(filename)
     sheet = workbook.active
     return list(sheet.values)
+
 
 def AssociateDocument(template, output_directory, student):
     doc = DocxTemplate(template)
@@ -64,10 +70,12 @@ def AssociateDocument(template, output_directory, student):
     doc.save(doc_name)
     return doc_name
 
+
 def AssociateConvertPDF(doc_path, pdf_directory):
     pdf_path = os.path.join(pdf_directory, os.path.splitext(os.path.basename(doc_path))[0] + ".pdf")
     convert(doc_path, pdf_path)
     return pdf_path
+
 
 def GeneratAssociate(option):
     excel_file = "Associate.xlsx"
@@ -88,7 +96,8 @@ def GeneratAssociate(option):
             AssociateConvertPDF(doc_path, pdf_directory)
             if option == "pdf":
                 os.remove(doc_path)
-    print(f"All associate files generated!")
+
+    print(f"✅ All associate files generated!")
 
 
 # ---------------------- Transcript Functions ----------------------
@@ -96,6 +105,7 @@ def TranscriptExcel_data(filename):
     workbook = openpyxl.load_workbook(filename)
     sheet = workbook.active
     return list(sheet.values)
+
 
 def TranscriptDocument(template, output_directory, row_data):
     doc = DocxTemplate(template)
@@ -158,10 +168,12 @@ def TranscriptDocument(template, output_directory, row_data):
     doc.save(doc_name)
     return doc_name
 
+
 def TranscriptPdf(doc_path, pdf_directory):
     pdf_path = os.path.join(pdf_directory, os.path.splitext(os.path.basename(doc_path))[0] + ".pdf")
     convert(doc_path, pdf_path)
     return pdf_path
+
 
 def generate_transcripts(option):
     excel_file = "data.xlsx"
@@ -182,7 +194,7 @@ def generate_transcripts(option):
             TranscriptPdf(doc_path, pdf_directory)
             if option == "pdf":
                 os.remove(doc_path)
-    print(f"All transcript files generated!")
+    print(f"✅ All transcript files generated!")
 
 
 # ---------------------- MODERN FRONTEND ----------------------
@@ -200,7 +212,7 @@ def create_ui():
     tk.Label(header_frame, text="Auto Generate Documentations",
              fg="white", bg="#3f88f7", font=("Segoe UI", 28, "bold")).pack(pady=(25, 0))
     tk.Label(header_frame, text="Easily create Transcripts, Certificates, and Associate Files",
-             fg="#dbe8ff", bg="blue", font=("Segoe UI", 12, "italic")).pack(pady=5)
+             fg="#dbe8ff", bg="#3f88f7", font=("Segoe UI", 12, "italic")).pack(pady=5)
 
     # --- Frosted White Card ---
     glass_frame = tk.Frame(window, bg="white", highlightbackground="#cfd8e3",
@@ -224,7 +236,6 @@ def create_ui():
         option_window = tk.Toplevel(window)
         option_window.title(title)
         option_window.geometry("400x300")
-        option_window.configure()
 
         tk.Label(option_window, text=f"Select format for {title}:",
                  font=("Segoe UI", 16, "bold")).pack(pady=10)
@@ -238,7 +249,7 @@ def create_ui():
                command=lambda: generate_with_option("doc")).pack(pady=5)
         Button(option_window, text="PDF Only", bootstyle="success-outline", width=48,
                command=lambda: generate_with_option("pdf")).pack(pady=5)
-        Button(option_window, text="Both DOCX & PDF", bootstyle="primary-outline", width=48, 
+        Button(option_window, text="Both DOCX & PDF", bootstyle="primary-outline", width=48,
                command=lambda: generate_with_option("both")).pack(pady=5)
 
     tk.Label(glass_frame, text="Select a Document Type",
