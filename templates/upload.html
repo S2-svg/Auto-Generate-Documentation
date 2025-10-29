@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Files - DocGenius</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-glass">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-white" href="/">
+                <i class="fas fa-magic me-2"></i>DocGenius
+            </a>
+            <div>
+                <a href="/" class="btn btn-outline-light me-2">
+                    <i class="fas fa-home me-1"></i>Home
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Upload Card -->
+                <div class="upload-section animate-fadeInUp">
+                    <div class="upload-header">
+                        <h2 class="mb-0"><i class="fas fa-cloud-upload-alt me-2"></i>Upload Your Files</h2>
+                        <p class="mb-0 mt-2 opacity-90">Let's create something amazing together!</p>
+                    </div>
+
+                    <div class="upload-body">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                        {% for category, message in messages %}
+                        <div
+                            class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show animate-slideInDown">
+                            <i
+                                class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' }} me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                        {% endwith %}
+
+                        <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                            <!-- Document Type Selection -->
+                            <div class="form-glass">
+                                <label class="form-label fw-bold text-dark mb-3">
+                                    <i class="fas fa-file-alt me-2"></i>What would you like to create?
+                                </label>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <input type="radio" class="btn-check" name="document_type" value="transcript"
+                                            id="transcript" required>
+                                        <label class="btn btn-outline-primary w-100 h-100 p-3" for="transcript">
+                                            <i class="fas fa-graduation-cap fa-2x mb-2"></i><br>
+                                            Transcript<br>
+                                            <small class="text-muted">Academic Records</small>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="radio" class="btn-check" name="document_type" value="certificate"
+                                            id="certificate">
+                                        <label class="btn btn-outline-success w-100 h-100 p-3" for="certificate">
+                                            <i class="fas fa-award fa-2x mb-2"></i><br>
+                                            Certificate<br>
+                                            <small class="text-muted">Achievements</small>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="radio" class="btn-check" name="document_type" value="associate"
+                                            id="associate">
+                                        <label class="btn btn-outline-info w-100 h-100 p-3" for="associate">
+                                            <i class="fas fa-user-graduate fa-2x mb-2"></i><br>
+                                            Associate<br>
+                                            <small class="text-muted">Degree Documents</small>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Output Format -->
+                            <div class="form-glass">
+                                <label class="form-label fw-bold text-dark mb-3">
+                                    <i class="fas fa-download me-2"></i>Choose Your Format
+                                </label>
+                                <div class="row g-2">
+                                    <div class="col-4">
+                                        <input type="radio" class="btn-check" name="file_format" value="doc"
+                                            id="formatDoc">
+                                        <label class="btn btn-outline-info w-100" for="formatDoc">
+                                            <i class="fas fa-file-word me-1"></i>DOCX
+                                        </label>
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="radio" class="btn-check" name="file_format" value="pdf"
+                                            id="formatPdf">
+                                        <label class="btn btn-outline-danger w-100" for="formatPdf">
+                                            <i class="fas fa-file-pdf me-1"></i>PDF
+                                        </label>
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="radio" class="btn-check" name="file_format" value="both"
+                                            id="formatBoth" checked>
+                                        <label class="btn btn-outline-primary w-100" for="formatBoth">
+                                            <i class="fas fa-copy me-1"></i>Both
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Data Input Method -->
+                            <div class="form-glass">
+                                <label class="form-label fw-bold text-dark mb-3">
+                                    <i class="fas fa-database me-2"></i>How would you like to provide student data?
+                                </label>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <input type="radio" class="btn-check" name="data_method" value="excel"
+                                            id="excelMethod" checked>
+                                        <label class="btn btn-outline-success w-100 h-100 p-3" for="excelMethod">
+                                            <i class="fas fa-file-excel fa-2x mb-2"></i><br>
+                                            Excel File<br>
+                                            <small class="text-muted">Multiple Students</small>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="radio" class="btn-check" name="data_method" value="manual"
+                                            id="manualMethod">
+                                        <label class="btn btn-outline-warning w-100 h-100 p-3" for="manualMethod">
+                                            <i class="fas fa-keyboard fa-2x mb-2"></i><br>
+                                            Manual Input<br>
+                                            <small class="text-muted">Single Student</small>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Excel File Upload (Default) -->
+                            <div class="form-glass" id="excelSection">
+                                <label class="form-label fw-bold text-dark mb-3">
+                                    <i class="fas fa-file-excel me-2"></i>Excel Data File
+                                </label>
+                                <div class="file-upload-area" id="excelUploadArea">
+                                    <input type="file" class="d-none" id="excel_file" name="excel_file"
+                                        accept=".xlsx,.xls">
+                                    <i class="fas fa-file-excel fa-3x text-success mb-3"></i>
+                                    <h5>Drop your Excel file here</h5>
+                                    <p class="text-muted">or click to browse</p>
+                                    <small class="text-muted">Supports .xlsx and .xls formats</small>
+                                </div>
+                                <div id="excelFileName" class="mt-2 text-success fw-bold"></div>
+                            </div>
+
+                            <!-- Manual Name Input (Hidden by Default) -->
+                            <div class="form-glass" id="manualSection" style="display: none;">
+                                <label class="form-label fw-bold text-dark mb-3">
+                                    <i class="fas fa-user-edit me-2"></i>Enter Student Information
+                                </label>
+                                <div class="manual-input-area p-4 border rounded">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Student Name *</label>
+                                        <input type="text" class="form-control" id="student_name" name="student_name"
+                                            placeholder="Enter full student name">
+                                    </div>
+                                    <div class="mb-3" id="studentIdField" style="display: none;">
+                                        <label class="form-label fw-semibold">Student ID</label>
+                                        <input type="text" class="form-control" id="student_id" name="student_id"
+                                            placeholder="Enter student ID">
+                                    </div>
+                                    <div class="mb-3" id="additionalFields" style="display: none;">
+                                        <!-- Additional fields will be shown based on document type -->
+                                    </div>
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Enter the student information manually for single document generation
+                                    </small>
+                                </div>
+                            </div>
+
+                            <!-- Template File Upload -->
+                            <div class="form-glass">
+                                <label class="form-label fw-bold text-dark mb-3">
+                                    <i class="fas fa-file-image me-2"></i>Document Template
+                                </label>
+                                <div class="file-upload-area" id="templateUploadArea">
+                                    <input type="file" class="d-none" id="template_file" name="template_file"
+                                        accept=".docx,.png,.jpg,.jpeg" required>
+                                    <i class="fas fa-file-alt fa-3x text-primary mb-3"></i>
+                                    <h5>Drop your template here</h5>
+                                    <p class="text-muted">or click to browse</p>
+                                    <small class="text-muted">DOCX for documents, PNG/JPG for certificates</small>
+                                </div>
+                                <div id="templateFileName" class="mt-2 text-primary fw-bold"></div>
+                            </div>
+
+                            <!-- Generate Button -->
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-magic btn-lg px-5" id="generateBtn">
+                                    <i class="fas fa-wand-magic-sparkles me-2"></i>
+                                    Generate Magic!
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Loading Overlay -->
+                        <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+                            <div class="text-center">
+                                <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;"></div>
+                                <h5 class="text-white">Creating your documents...</h5>
+                                <p class="text-white-50">This may take a few moments</p>
+                                <div class="progress-container">
+                                    <div class="progress-bar"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tips Card -->
+                <div class="feature-card mt-4 animate-fadeInUp" style="animation-delay: 0.3s;">
+                    <h5><i class="fas fa-lightbulb me-2 text-warning"></i>Pro Tips</h5>
+                    <ul class="list-unstyled text-muted">
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Ensure your Excel columns
+                            match the template requirements</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Use high-quality templates
+                            for best results</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Batch process multiple
+                            documents at once</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Use manual input for quick
+                            single document generation</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // File upload handling
+        const excelArea = document.getElementById('excelUploadArea');
+        const templateArea = document.getElementById('templateUploadArea');
+        const excelInput = document.getElementById('excel_file');
+        const templateInput = document.getElementById('template_file');
+        const excelName = document.getElementById('excelFileName');
+        const templateName = document.getElementById('templateFileName');
+        const generateBtn = document.getElementById('generateBtn');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const form = document.getElementById('uploadForm');
+
+        // Data method toggle
+        const excelMethod = document.getElementById('excelMethod');
+        const manualMethod = document.getElementById('manualMethod');
+        const excelSection = document.getElementById('excelSection');
+        const manualSection = document.getElementById('manualSection');
+        const studentIdField = document.getElementById('studentIdField');
+        const additionalFields = document.getElementById('additionalFields');
+
+        // Toggle between Excel and Manual input
+        excelMethod.addEventListener('change', toggleDataMethod);
+        manualMethod.addEventListener('change', toggleDataMethod);
+
+        function toggleDataMethod() {
+            if (excelMethod.checked) {
+                excelSection.style.display = 'block';
+                manualSection.style.display = 'none';
+                excelInput.required = true;
+            } else {
+                excelSection.style.display = 'none';
+                manualSection.style.display = 'block';
+                excelInput.required = false;
+            }
+        }
+
+        // Show/hide additional fields based on document type
+        document.querySelectorAll('input[name="document_type"]').forEach(radio => {
+            radio.addEventListener('change', updateAdditionalFields);
+        });
+
+        function updateAdditionalFields() {
+            const documentType = document.querySelector('input[name="document_type"]:checked');
+            if (!documentType) return;
+
+            studentIdField.style.display = 'block';
+            additionalFields.innerHTML = '';
+
+            if (documentType.value === 'transcript') {
+                additionalFields.innerHTML = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">First Name</label>
+                            <input type="text" class="form-control" name="first_name" placeholder="First name">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Last Name</label>
+                            <input type="text" class="form-control" name="last_name" placeholder="Last name">
+                        </div>
+                    </div>
+                `;
+                additionalFields.style.display = 'block';
+            } else if (documentType.value === 'associate') {
+                additionalFields.innerHTML = `
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Name in Khmer</label>
+                        <input type="text" class="form-control" name="name_kh" placeholder="Name in Khmer">
+                    </div>
+                `;
+                additionalFields.style.display = 'block';
+            } else {
+                additionalFields.style.display = 'none';
+            }
+        }
+
+        // Excel file handling
+        excelArea.addEventListener('click', () => excelInput.click());
+        excelArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            excelArea.classList.add('dragover');
+        });
+        excelArea.addEventListener('dragleave', () => excelArea.classList.remove('dragover'));
+        excelArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            excelArea.classList.remove('dragover');
+            excelInput.files = e.dataTransfer.files;
+            updateFileName(excelInput, excelName);
+        });
+        excelInput.addEventListener('change', () => updateFileName(excelInput, excelName));
+
+        // Template file handling
+        templateArea.addEventListener('click', () => templateInput.click());
+        templateArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            templateArea.classList.add('dragover');
+        });
+        templateArea.addEventListener('dragleave', () => templateArea.classList.remove('dragover'));
+        templateArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            templateArea.classList.remove('dragover');
+            templateInput.files = e.dataTransfer.files;
+            updateFileName(templateInput, templateName);
+        });
+        templateInput.addEventListener('change', () => updateFileName(templateInput, templateName));
+
+        function updateFileName(input, nameElement) {
+            if (input.files.length > 0) {
+                nameElement.innerHTML = `<i class="fas fa-file me-1"></i>Selected: ${input.files[0].name}`;
+            }
+        }
+
+        // Form submission
+        form.addEventListener('submit', function (e) {
+            const documentType = document.querySelector('input[name="document_type"]:checked');
+            if (!documentType) {
+                e.preventDefault();
+                alert('Please select a document type!');
+                return;
+            }
+
+            // Validate manual input
+            if (manualMethod.checked) {
+                const studentName = document.getElementById('student_name').value.trim();
+                if (!studentName) {
+                    e.preventDefault();
+                    alert('Please enter student name!');
+                    return;
+                }
+            }
+
+            loadingOverlay.style.display = 'flex';
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Generating...';
+        });
+
+        // Add some interactive animations
+        document.addEventListener('DOMContentLoaded', function () {
+            const cards = document.querySelectorAll('.feature-card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+    </script>
+</body>
+
+</html>
